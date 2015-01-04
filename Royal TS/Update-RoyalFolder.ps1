@@ -6,8 +6,8 @@
 	This script will mirror the OU structure from the specified root OU to a top level folder in the specified Royal TS document and create Remote Desktop Connection objects for all AD computer accounts meeting specific criterias.
 
     The criterias is the following:
-    -The computer object is registered with a Server operating system (the object`s "Operatingsystem" LDAP property meets the filter "Windows Server*")
-    -The computer object is not a Cluster Name Object (the object`s "ServicePrincipalName" LDAP property does not contain the word MSClusterVirtualServer)
+    -The computer object is registered with a Server operating system (the object's "Operatingsystem" LDAP property meets the filter "Windows Server*")
+    -The computer object is not a Cluster Name Object (the object's "ServicePrincipalName" LDAP property does not contain the word MSClusterVirtualServer)
     -The computer account has logged on to the domain in the past X number of days (X is 60 days if the parameter InactiveComputerObjectThresholdInDays is not specified)
     
     The purpose of this script is to show how the Royal TS PowerShell module available in Royal TS V3 beta can be used to manage a Royal TS document. Thus it must be customized to meet specific needs, the script shows how to configure a couple of Remote Desktop connection properties as an example.
