@@ -112,10 +112,6 @@ Where-Object lastlogondate -gt $Date.AddDays(-$InactiveComputerObjectThresholdIn
 Select-Object -Property name,dnshostname,lastlogondate,description |
 Sort-Object -Property name
 
-if ($ADObjects) {
-
-Write-Verbose -Message "Updating $($FolderName)"
-
 $RoyalFolder = Get-RoyalObjects -Type Folder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $SearchBase}
 
 $RDSConnectionNames = Get-RoyalObjects -Store $Store | 
@@ -125,6 +121,9 @@ Select-Object -ExpandProperty name
 $RDSConnections = Get-RoyalObjects -Store $Store | 
 Where-Object {$_.objecttype -eq 'RoyalRDSConnection' -and $_.ParentId -eq $RoyalFolder.Id.Guid} 
 
+if ($ADObjects) {
+
+Write-Verbose -Message "Updating $($FolderName)"
 
 foreach ($ADObject in $ADObjects) 
 {
@@ -160,6 +159,24 @@ if ($UpdateRoyalComputerProperties) {
 } else {
 
 Write-Verbose -Message "No computer objects matching the selected filter found in OU $($FolderName)"
+
+}
+
+
+if ($RDSConnections -and $RemoveInactiveComputerObjects) {
+
+Write-Verbose -Message "Checking OU $($FolderName) for inactive computer objects"
+
+foreach ($item in $RDSConnections) {
+
+        if ($item.Name -notin $ADObjects.Name) {
+
+    Write-Verbose -Message "Removing inactive computer object $($item.Name)"
+
+    $null = Remove-RoyalObject -Object $item
+
+    }
+}
 
 }
 
@@ -299,39 +316,6 @@ $ChildOUs = $ChildOUsToProcess
 
 } #end if $OUs
     
-
-if ($RemoveInactiveComputerObjects) {
-
-Write-Verbose -Message "Checking for inactive computer objects to remove"
-
-$Date = Get-Date
-$ADObjects = Get-ADComputer -SearchBase $RootOUPath -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*))" -Properties description,lastlogondate | 
-Where-Object lastlogondate -gt $Date.AddDays(-$InactiveComputerObjectThresholdInDays) |  
-Sort-Object name |
-Select-Object -ExpandProperty name
-
-
-$RoyalFolder = Get-RoyalObjects -Type Folder -Store $store | Where-Object {$_.Name -eq $RootOU.Name -and $_.Description -eq $RootOU.DistinguishedName}
-
-$RDSConnections = Get-RoyalObjects -Store $Store | 
-Where-Object {$_.objecttype -eq 'RoyalRDSConnection' -and $_.ParentId -eq $RoyalFolder.Id.Guid}
-
-foreach ($item in $RDSConnections)
-{
-    if ($item.Name -notin $ADObjects) {
-
-    Write-Verbose -Message "Removing inactive computer object $($item.Name)"
-
-    $null = Remove-RoyalObject -Object $item
-
-    }
-}
-
-
-
-
-}
-
 # Store the updated document to disk and close it
 Out-RoyalDocument -Document $RoyalDocument
 Close-RoyalDocument -Document $RoyalDocument
