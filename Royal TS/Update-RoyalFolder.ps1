@@ -30,16 +30,21 @@
 
 .Parameter UpdateRoyalComputerProperties
 	Switch parameter to specify whether you want to update the Remote Desktop connection properties. Applies for computer objects both new and already present in the Royal TS document.
-    The properties to be updated is hard coded to enable Smart sizing and inheritance of credentials from the parent folder.
+    	The properties to be updated is hard coded to enable Smart sizing and inheritance of credentials from the parent folder.
+
+.Parameter UpdateRoyalFolderProperties
+	Switch parameter to specify whether you want to update the Royal Folder properties. Applies for folder objects both new and already present in the Royal TS document.
+    	The properties to be updated is hard coded to enable inheritance of credentials from the parent folder.
 
 .Parameter RTSPSModulePath
 	Specifies the path to the Royal TS PowerShell module. If Royal TS V3 beta was installed using the MSI-file, this parameter is not required.
-    Specify the path if you downloaded and extracted the zip-file version of Royal TS V3 to an alternate location.
+  	Specify the path if you downloaded and extracted the zip-file version of Royal TS V3 to an alternate location.
 
 .Notes
             Name: Update-RoyalFolder.ps1
             Author: Jan Egil Ring
             Date Created: 01 Jan 2015
+	    Last Modified: 07 Jan 2015, Jan Egil Ring
 
 .Example
 	& C:\MyScripts\Update-RoyalFolder.ps1 -RootOUPath 'OU=Servers,DC=lab,DC=local' -RoyalDocumentPath C:\temp\Servers.rtsz
@@ -64,9 +69,10 @@
 		[string]$RootOUPath,
 		[string]$RoyalDocumentPath = (Join-Path -Path $env:USERPROFILE -ChildPath ('Documents\' + $env:USERDOMAIN + '.rtsz')),
 		[switch]$RemoveInactiveComputerObjects,
-        [string]$InactiveComputerObjectThresholdInDays = '60',
+        	[string]$InactiveComputerObjectThresholdInDays = '60',
 		[switch]$UpdateRoyalComputerProperties,
-        [string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll')
+		[switch]$UpdateRoyalFolderProperties,
+       		[string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll')
 	)
 
 
@@ -201,15 +207,27 @@ throw "Parent does not exists"
 
 }
 
-$null = New-RoyalObject -folder $RoyalFolderParent -Type RoyalFolder -Name $FolderName -Description $Description
+$RoyalFolder = New-RoyalObject -folder $RoyalFolderParent -Type RoyalFolder -Name $FolderName -Description $Description
 
 } else {
 
-$null = New-RoyalObject -folder $RoyalDocument -Type RoyalFolder -Name $FolderName -Description $Description
+$RoyalFolder = New-RoyalObject -folder $RoyalDocument -Type RoyalFolder -Name $FolderName -Description $Description
 
 }
 
 }
+
+    if ($UpdateRoyalFolderProperties) {
+
+    if ($RoyalFolder.CredentialFromParent -ne $true) {
+
+    Write-Verbose -Message "Enabling CredentialFromParent for folder $FolderName"
+
+    $RoyalFolder.CredentialFromParent = $true
+
+    }
+
+    }
 
 }
 
