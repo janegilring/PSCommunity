@@ -67,12 +67,13 @@
 	param (
 		[Parameter(Mandatory = $true)]
 		[string]$RootOUPath,
+        [string]$ADDomainController,
 		[string]$RoyalDocumentPath = (Join-Path -Path $env:USERPROFILE -ChildPath ('Documents\' + $env:USERDOMAIN + '.rtsz')),
 		[switch]$RemoveInactiveComputerObjects,
-        	[string]$InactiveComputerObjectThresholdInDays = '60',
+      	[string]$InactiveComputerObjectThresholdInDays = '60',
 		[switch]$UpdateRoyalComputerProperties,
 		[switch]$UpdateRoyalFolderProperties,
-       		[string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll')
+       	[string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll')
 	)
 
 
@@ -88,6 +89,12 @@ throw "Royal TS PowerShell module does not exist at $RTSPSModulePath"
 if (-not (Get-Module -Name RoyalDocument.PowerShell)) {
 
 Import-Module $RTSPSModulePath
+
+}
+
+if (-not $ADDomainController) {
+
+$ADDomainController = $env:USERDNSDOMAIN
 
 }
 
@@ -113,7 +120,7 @@ function Update-RoyalFolder ($SearchBase, $FolderName)
 {
     
 $Date = Get-Date
-$ADObjects = Get-ADComputer -searchbase $SearchBase -SearchScope OneLevel -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*))" -Properties description,lastlogondate | 
+$ADObjects = Get-ADComputer -Server $ADDomainController -searchbase $SearchBase -SearchScope OneLevel -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*))" -Properties description,lastlogondate | 
 Where-Object lastlogondate -gt $Date.AddDays(-$InactiveComputerObjectThresholdInDays) |  
 Select-Object -Property name,dnshostname,lastlogondate,description |
 Sort-Object -Property name
@@ -274,7 +281,7 @@ Write-Verbose -Message "Checking for computer object $($item.Name) for property 
 
 try
 {
-    $RootOU = Get-ADOrganizationalUnit -Identity $RootOUPath -ErrorAction Stop
+    $RootOU = Get-ADOrganizationalUnit -Server $ADDomainController -Identity $RootOUPath -ErrorAction Stop
 }
 catch
 {
@@ -290,7 +297,7 @@ Test-RoyalFolder -FolderName $RootOU.Name -Description $RootOU.DistinguishedName
 
 Update-RoyalFolder -SearchBase $RootOU.DistinguishedName -FolderName $RootOU.Name
 
-$OUs = Get-ADOrganizationalUnit -SearchBase $RootOU -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
+$OUs = Get-ADOrganizationalUnit -Server $ADDomainController -SearchBase $RootOU -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
 
 
 if ($OUs) {
@@ -303,7 +310,7 @@ Test-RoyalFolder -FolderName $OU.Name -Description $OU.DistinguishedName -Parent
 
 Update-RoyalFolder -SearchBase $OU.DistinguishedName -FolderName $OU.Name
 
-$ChildOUs = Get-ADOrganizationalUnit -SearchBase $OU.DistinguishedName -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
+$ChildOUs = Get-ADOrganizationalUnit -Server $ADDomainController -SearchBase $OU.DistinguishedName -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
 
 $ChildOUsToProcess = $true
 
@@ -320,7 +327,7 @@ Test-RoyalFolder -FolderName $ChildOU.Name -Description $ChildOU.DistinguishedNa
 
 Update-RoyalFolder -SearchBase $ChildOU.DistinguishedName -FolderName $ChildOU.Name
 
-$ChildOUsToProcess += Get-ADOrganizationalUnit -SearchBase $ChildOU.DistinguishedName -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
+$ChildOUsToProcess += Get-ADOrganizationalUnit -Server $ADDomainController -SearchBase $ChildOU.DistinguishedName -Filter * -SearchScope OneLevel | Select-Object Name,DistinguishedName
 
 } #end foreach $ChildOU
 
