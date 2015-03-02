@@ -44,7 +44,7 @@
             Name: Update-RoyalFolder.ps1
             Author: Jan Egil Ring
             Date Created: 01 Jan 2015
-	    Last Modified: 07 Jan 2015, Jan Egil Ring
+	        Last Modified: 02 March 2015, Jan Egil Ring
 
 .Example
 	& C:\MyScripts\Update-RoyalFolder.ps1 -RootOUPath 'OU=Servers,DC=lab,DC=local' -RoyalDocumentPath C:\temp\Servers.rtsz
@@ -125,14 +125,13 @@ Where-Object lastlogondate -gt $Date.AddDays(-$InactiveComputerObjectThresholdIn
 Select-Object -Property name,dnshostname,lastlogondate,description |
 Sort-Object -Property name
 
-$RoyalFolder = Get-RoyalObjects -Type Folder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $SearchBase}
+$RoyalFolder = Get-RoyalObject -Type RoyalFolder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $SearchBase}
 
-$RDSConnectionNames = Get-RoyalObjects -Store $Store | 
-Where-Object {$_.objecttype -eq 'RoyalRDSConnection' -and $_.ParentId -eq $RoyalFolder.Id.Guid} | 
-Select-Object -ExpandProperty name
+$RDSConnections = Get-RoyalObject -Type RoyalRDSConnection -Store $Store | 
+Where-Object {$_.ParentId -eq $RoyalFolder.Id.Guid} 
 
-$RDSConnections = Get-RoyalObjects -Store $Store | 
-Where-Object {$_.objecttype -eq 'RoyalRDSConnection' -and $_.ParentId -eq $RoyalFolder.Id.Guid} 
+$RDSConnectionNames = $RDSConnections | Select-Object -ExpandProperty name
+
 
 if ($ADObjects) {
 
@@ -199,14 +198,14 @@ foreach ($item in $RDSConnections) {
 function Test-RoyalFolder ($Description, $FolderName, $ParentFolderName, $ParentFolderNameDescription)
 {
 
-$RoyalFolder = Get-RoyalObjects -Type Folder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $Description}
+$RoyalFolder = Get-RoyalObject -Type RoyalFolder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $Description}
 
 
 if (-not ($RoyalFolder)) {
 
 if ($ParentFolderName) {
 
-$RoyalFolderParent = Get-RoyalObjects -Type Folder -Store $Store | Where-Object {$_.Name -eq $ParentFolderName -and $_.Description -eq $ParentFolderNameDescription}
+$RoyalFolderParent = Get-RoyalObject -Type RoyalFolder -Store $Store | Where-Object {$_.Name -eq $ParentFolderName -and $_.Description -eq $ParentFolderNameDescription}
 
 if (-not ($RoyalFolderParent)) {
 
@@ -214,11 +213,11 @@ throw "Parent does not exists"
 
 }
 
-$RoyalFolder = New-RoyalObject -folder $RoyalFolderParent -Type RoyalFolder -Name $FolderName -Description $Description
+$RoyalFolder = New-RoyalObject -Folder $RoyalFolderParent -Type RoyalFolder -Name $FolderName -Description $Description
 
 } else {
 
-$RoyalFolder = New-RoyalObject -folder $RoyalDocument -Type RoyalFolder -Name $FolderName -Description $Description
+$RoyalFolder = New-RoyalObject -Folder $RoyalDocument -Type RoyalFolder -Name $FolderName -Description $Description
 
 }
 
