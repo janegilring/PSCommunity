@@ -2,7 +2,7 @@
 
 Import-Module DataProtectionManager
 
-$csv = Import-Csv C:\temp\infisiert.csv -Delimiter ';'
+$csv = Import-Csv C:\temp\infected.csv -Delimiter ';'
 
 $pg = Get-ProtectionGroup -DPMServerName DPM01 | where FriendlyName -eq 'File cluster'
 $ps = Get-DPMProductionServer | where servername -eq FILE01
