@@ -40,6 +40,10 @@
 	Specifies the path to the Royal TS PowerShell module. If Royal TS V3 beta was installed using the MSI-file, this parameter is not required.
   	Specify the path if you downloaded and extracted the zip-file version of Royal TS V3 to an alternate location.
 
+.Parameter ADCredential
+	Specifies the credential to use when communicating with AD Domain Controllers
+
+
 .Notes
             Name: Update-RoyalFolder.ps1
             Author: Jan Egil Ring
@@ -73,7 +77,8 @@
       	[string]$InactiveComputerObjectThresholdInDays = '60',
 		[switch]$UpdateRoyalComputerProperties,
 		[switch]$UpdateRoyalFolderProperties,
-       	[string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll')
+       	[string]$RTSPSModulePath = (Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'code4ward.net\Royal TS V3\RoyalDocument.PowerShell.dll'),
+        [pscredential]$ADCredential
 	)
 
 
@@ -95,6 +100,14 @@ Import-Module $RTSPSModulePath
 if (-not $ADDomainController) {
 
 $ADDomainController = $env:USERDNSDOMAIN
+
+}
+
+# Adding -Credential to AD-cmdlets (if specified)
+
+if ($ADCredential) {
+
+$PSDefaultParameterValues.Add("*-AD*:Credential",$ADCredential)
 
 }
 
@@ -120,10 +133,15 @@ function Update-RoyalFolder ($SearchBase, $FolderName)
 {
     
 $Date = Get-Date
+
+
+
 $ADObjects = Get-ADComputer -Server $ADDomainController -searchbase $SearchBase -SearchScope OneLevel -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*))" -Properties description,lastlogondate | 
 Where-Object lastlogondate -gt $Date.AddDays(-$InactiveComputerObjectThresholdInDays) |  
 Select-Object -Property name,dnshostname,lastlogondate,description |
 Sort-Object -Property name
+
+
 
 $RoyalFolder = Get-RoyalObject -Type RoyalFolder -Store $Store | Where-Object {$_.Name -eq $FolderName -and $_.Description -eq $SearchBase}
 
