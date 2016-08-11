@@ -86,12 +86,12 @@ Start-VM -Name VM3
 <#
 
 *Summary*
-The technique show cased in this demonstration can be used to bootstrap virtual machines only with the DSC meta 
-configuration (.meta.mof) generated for connecting to Azure Automation DSC as a pull server.
-That way, the configurations and all others settings (credentials, global variables, etc) can be dynamically retrieved from 
-Azure Automation. Another advantage of using Azure Automation DSC as a pull server in general, is that you do not need to 
-handle the encryption certificatite yourself. During the bootstrapping process Azure Automation DSC will automatically create
-a certificate in the local machine`s certificate store for this purpose (CN=DSC-OaaS).
+In this video we are going to look at how we can bootstrap virtual machines only with the DSC meta configuration (.meta.mof) required for connecting to 
+Azure Automation DSC as a pull server.
+That way, the configurations and all others settings (credentials, global variables, etc) can be dynamically retrieved from Azure Automation. 
+Another advantage of using Azure Automation DSC as a pull server in general, is that you do not need to handle the encryption certificate yourself. 
+During the bootstrapping process Azure Automation DSC will automatically create a certificate (CN=DSC-OaaS) in the local machine`s certificate store for this purpose.
+ 
 
 *Documentation - Azure Automation DSC*
 https://azure.microsoft.com/en-us/documentation/articles/automation-dsc-overview/
