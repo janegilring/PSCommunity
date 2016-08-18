@@ -130,16 +130,10 @@ else
 	$MSWord.Selection.Find.Execute($FindText, $MatchCase, $MatchWholeWord,	$MatchWildcards, $MatchSoundsLike, $MatchAllWordForms, $Forward, $Wrap,	$Format, $ReplaceText, $ReplaceAll	)
 	$MSWord.Selection.Find.Execute("Email")
 	$MSWord.ActiveDocument.Hyperlinks.Add($MSWord.Selection.Range, "mailto:"+$ADEmailAddress.ToString(), $missing, $missing, $ADEmailAddress.ToString())
-	$saveFormat = [Enum]::Parse([Microsoft.Office.Interop.Word.WdSaveFormat], "wdFormatHTML");
-	$path = $LocalSignaturePath+'\'+$CompanyName+".htm"
-	$MSWord.ActiveDocument.saveas([ref]$path, [ref]$saveFormat)
-	$saveFormat = [Enum]::Parse([Microsoft.Office.Interop.Word.WdSaveFormat], "wdFormatRTF");
-	$path = $LocalSignaturePath+'\'+$CompanyName+".rtf"
-	$MSWord.ActiveDocument.SaveAs([ref] $path, [ref]$saveFormat)
-	$saveFormat = [Enum]::Parse([Microsoft.Office.Interop.Word.WdSaveFormat], "wdFormatText");
-	$path = $LocalSignaturePath+'\'+$CompanyName+".txt"
-	$MSWord.ActiveDocument.SaveAs([ref] $path, [ref]$SaveFormat)
-	$MSWord.ActiveDocument.Close()
+        # Select all in the document
+        $objSelection = $objDoc.Range()
+        # Save the signature to Outlook
+	$EmailSignatureEntries.Add($CompanyName, $objSelection)
 	$MSWord.Quit()
 }
 #Stamp registry-values for Outlook Signature Settings if they doesn`t match the initial script variables. Note that these will apply after the second script run when changes are made in the "Custom variables"-section.
