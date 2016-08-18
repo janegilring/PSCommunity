@@ -131,7 +131,7 @@ else
 	$MSWord.Selection.Find.Execute("Email")
 	$MSWord.ActiveDocument.Hyperlinks.Add($MSWord.Selection.Range, "mailto:"+$ADEmailAddress.ToString(), $missing, $missing, $ADEmailAddress.ToString())
         # Select all in the document
-        $objSelection = $objDoc.Range()
+        $objSelection = $MSWord.Range()
         # Save the signature to Outlook
 	$EmailSignatureEntries.Add($CompanyName, $objSelection)
 	$MSWord.Quit()
