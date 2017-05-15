@@ -2,9 +2,9 @@
 {
   <#
       .SYNOPSIS
-      Get-HotfixStatus is a command to retrieve hotfix information.
+      Get-HotfixStatus is a command to retrieve hotfix information for one or more specified hotfixes.
       .DESCRIPTION
-      Get-HotfixStatus is a command to retrieve hotfix information. This can be used as a tool to identify which servers is missing specific updates.
+      Get-HotfixStatus is a command to retrieve hotfix information for one or more specified hotfixes. This can be used as a tool to identify which servers is missing specific updates.
       .EXAMPLE
       Get information from localhost
       Get-HotfixStatus -HotFixes KB4012212
