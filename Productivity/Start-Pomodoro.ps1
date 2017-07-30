@@ -6,10 +6,12 @@
 Function Start-Pomodoro {
     Param (
         #Duration of your Pomodoro Session
-        [int]$Minutes = 25
+        [int]$Minutes = 25,
+        [string]$AudioFilePath,
+        [switch]$StartMusic
     )
       
-    #Add the path your wave file here
+    #Add the path your wav file here
     $StartWave = "C:\Windows\Media\Windows Proximity Connection.wav"
     $EndWave = "C:\Windows\Media\Windows Proximity Notification.wav"
     $stop = $False
@@ -18,6 +20,43 @@ Function Start-Pomodoro {
     if (!(Test-Path $EndWave)) {Write-host End Wave file not found; $stop = "True"}
     if ($Stop -eq $True) {Read-host "Wav files could not be found, press enter to continue or crl+c to exit"}
   
+    if ($StartMusic) {
+
+        if ($AudioFilePath) {
+
+            if (Test-Path -Path $AudioFilePath) {
+
+                # Invoke item if it is a file, else pick a random file from the folder (intended for folders containing audio files)
+                if ((Get-Item -Path $AudioFilePath).PsIsContainer) {
+
+                    $AudioFile = Get-ChildItem -Path $AudioFilePath -File | Get-Random
+                    $AudioFile | Invoke-Item
+                    
+                    Write-Host "Started audio file $($AudioFile.FullName)" -ForegroundColor Green
+
+                } else {
+
+                    Invoke-Item -Path $AudioFilePath
+
+                    Write-Host "Started audio file $AudioFilePath" -ForegroundColor Green
+
+                }
+
+            } else 
+
+            {
+
+                Write-Host "AudioFilePath $AudioFilePath does not exist, no music invoked"
+
+            }
+
+        } else {
+
+            Write-Host 'AudioFilePath not specified, no music invoked'
+
+        }
+
+    }
   
     $seconds = $Minutes * 60
     $delay = 1 #seconds between ticks
