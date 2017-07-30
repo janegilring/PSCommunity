@@ -9,18 +9,12 @@ Function Start-Pomodoro {
         #Duration of your Pomodoro Session
         [int]$Minutes = 25,
         [string]$AudioFilePath,
-        [switch]$StartMusic
+        [switch]$StartMusic,
+        [string]$StartNotificationSound = "C:\Windows\Media\Windows Proximity Connection.wav",
+        [string]$EndNotificationSound = "C:\Windows\Media\Windows Proximity Notification.wav"
     )
       
-    #Add the path your wav file here
-    $StartWave = "C:\Windows\Media\Windows Proximity Connection.wav"
-    $EndWave = "C:\Windows\Media\Windows Proximity Notification.wav"
-    $stop = $False
  
-    if (!(Test-Path $StartWave)) {Write-host Start Wave file not found; $stop = "True"}
-    if (!(Test-Path $EndWave)) {Write-host End Wave file not found; $stop = "True"}
-    if ($Stop -eq $True) {Read-host "Wav files could not be found, press enter to continue or crl+c to exit"}
-  
     if ($StartMusic) {
 
         if ($PSBoundParameters.ContainsKey('AudioFilePath')) {
@@ -59,8 +53,6 @@ Function Start-Pomodoro {
 
     }
   
-    $seconds = $Minutes * 60
-    $delay = 1 #seconds between ticks
     $PersonalNote = "Will be available at $(Get-Date $((Get-Date).AddMinutes($Minutes)) -Format HH:mm)"
   
     #Set do-not-disturb Pomodoro Foucs custom presence, where 1 is my pomodoro custom presence state
@@ -71,11 +63,18 @@ Function Start-Pomodoro {
     #Setting computer to presentation mode, will suppress most types of popups
     presentationsettings /start
   
-    #Starting music, remember to change filepath to your wav file
-    $player = New-Object System.Media.SoundPlayer $StartWave -ErrorAction SilentlyContinue
-    1..2 | % { $player.Play() ; sleep -m 3400 }
+    if (Test-Path -Path $StartNotificationSound) {
+     
+    $player = New-Object System.Media.SoundPlayer $StartNotificationSound -ErrorAction SilentlyContinue
+     1..2 | ForEach-Object { 
+         $player.Play()
+        Start-Sleep -m 3400 
+    }
+    }
   
     #Counting down to end of Pomodoro
+    $seconds = $Minutes * 60
+    $delay = 1 #seconds between ticks
     for ($i = $seconds; $i -gt 0; $i = $i - $delay) {
         $percentComplete = 100 - (($i / $seconds) * 100)
         Write-Progress -SecondsRemaining $i `
@@ -91,12 +90,18 @@ Function Start-Pomodoro {
   
     #Pomodoro session finished, resetting status and personal note, availability 1 will reset the Lync status
     Publish-SfBContactInformation -PersonalNote ' '
-    Publish-SfBContactInformation -Availability Available
-  
+    Publish-SfBContactInformation -Availability Available  
 
-    #Playing end of focus session song\alarm, 6 times
-    $player = New-Object System.Media.SoundPlayer $EndWave -ErrorAction SilentlyContinue
-    1..2 | % { $player.Play() ; sleep -m 1400 }
+    if (Test-Path -Path $EndNotificationSound) {
+
+    #Playing end of focus session notification
+    $player = New-Object System.Media.SoundPlayer $EndNotificationSound -ErrorAction SilentlyContinue
+     1..2 | ForEach-Object {
+         $player.Play()
+        Start-Sleep -m 1400 
+    }
+
+    }
   
     Write-Host -Object "Pomodoro Focus session ended" -ForegroundColor Green
 
