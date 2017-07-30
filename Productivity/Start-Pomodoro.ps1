@@ -4,6 +4,7 @@
 #Note: for desktops you need to enable presentation settings in order to suppress email alerts, by MVP Robert Sparnaaij: https://msunified.net/2013/11/25/lock-down-your-lync-status-and-pc-notifications-using-powershell/
 
 Function Start-Pomodoro {
+    [CmdletBinding()]
     Param (
         #Duration of your Pomodoro Session
         [int]$Minutes = 25,
@@ -22,7 +23,7 @@ Function Start-Pomodoro {
   
     if ($StartMusic) {
 
-        if ($AudioFilePath) {
+        if ($PSBoundParameters.ContainsKey('AudioFilePath')) {
 
             if (Test-Path -Path $AudioFilePath) {
 
