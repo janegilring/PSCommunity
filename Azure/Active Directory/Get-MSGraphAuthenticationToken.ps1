@@ -1,4 +1,4 @@
-﻿Function Get-AuthenticationToken {
+﻿Function Get-MSGraphAuthenticationToken {
 
     <#
       .SYNOPSIS
@@ -8,7 +8,7 @@
       .EXAMPLE
       $Credential = Get-Credential
       $ClientId = 'f338765e-1cg71-427c-a14a-f3d542442dd'
-      $AuthToken = Get-AuthenticationToken -Credential $Credential -ClientId $ClientId
+      $AuthToken = Get-MSGraphAuthenticationToken -Credential $Credential -ClientId $ClientId
   #>
     [cmdletbinding()]
   
