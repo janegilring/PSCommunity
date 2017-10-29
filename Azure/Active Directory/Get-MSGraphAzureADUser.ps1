@@ -20,8 +20,10 @@ NAME: Get-AADUser
 
     param
     (
-        $UserPrincipalName,
-        $AuthToken
+        [Parameter(Mandatory=$true)]
+        [string]$UserPrincipalName,
+        [Parameter(Mandatory=$true)]
+        [object]$AuthenticationToken
     )
 
     # Defining Variables
@@ -31,9 +33,9 @@ NAME: Get-AADUser
     try {
 
 
-        $uri = "https://graph.microsoft.com/$graphApiVersion/$($User_resource)/$userPrincipalName"
+        $uri = "https://graph.microsoft.com/$graphApiVersion/$($User_resource)/$UserPrincipalName"
         Write-Verbose $uri
-        Invoke-RestMethod -Uri $uri -Headers $AuthToken -Method Get -ErrorAction Stop
+        Invoke-RestMethod -Uri $uri -Headers $AuthenticationToken -Method Get -ErrorAction Stop
 
 
     }
