@@ -7,10 +7,10 @@ This function is used to get AAD Users from the Graph API REST interface
 The function connects to the Graph API Interface and gets any users registered with AAD
 Created based on examples from https://github.com/microsoftgraph/powershell-intune-samples
 .EXAMPLE
-Get-AADUser
+Get-MSGraphAzureADUser
 Returns all users registered with Azure AD
 .EXAMPLE
-Get-AADUser -userPrincipleName user@domain.com
+Get-MSGraphAzureADUser -UserPrincipleName user@domain.com UUUUU - -   -AuthenticationToken $Token
 Returns specific user by UserPrincipalName registered with Azure AD
 .NOTES
 NAME: Get-AADUser
