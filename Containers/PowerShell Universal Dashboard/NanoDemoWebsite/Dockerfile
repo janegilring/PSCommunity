@@ -45,8 +45,6 @@ RUN pwsh -command mkdir C:\dashboards
 
 RUN pwsh -command Save-Module -Name UniversalDashboard -Path C:\dashboards -Force
 
-RUN pwsh -command $dir = dir C:\dashboards -Directory | Foreach-Object { dir $PSItem.FullName -Directory }; dir $dir.FullName | Copy-Item -Destination C:\dashboards\UniversalDashboard -Recurse
-
 COPY ["dashboard.ps1", "c:/dashboards/dashboard.ps1"]
 
 EXPOSE 80

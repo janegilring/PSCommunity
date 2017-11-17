@@ -1,10 +1,11 @@
-﻿Import-Module 'C:\dashboards\UniversalDashboard\UniversalDashboard.psd1'
+﻿Import-Module 'C:\dashboards\UniversalDashboard\1.0.281\UniversalDashboard.psd1'
 
 if (-not (Get-UDLicense)) {
 
     Set-UDLicense -License '<License><Terms>add-your-licence here</Signature></License>'
 
 }
+
 $Colors = @{
     BackgroundColor = "#FF252525"
     FontColor = "#FFFFFFFF"
