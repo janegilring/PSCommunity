@@ -29,7 +29,7 @@ Start-Process -FilePath iexplore.exe -ArgumentList http://$ContainerIP/register/
 Start-Process -FilePath chrome.exe -ArgumentList http://$ContainerIP/register/123
 
 # Optionally, connect to the container instance interactively to inspect the environment
-docker exec -ti $ContainerID powershell #pwsh/powershell
+docker exec -ti $ContainerID pwsh #pwsh for Nano/powershell for Server Core
 
 docker stop $ContainerID
 
