@@ -2,7 +2,7 @@
 
 if (-not (Get-UDLicense)) {
 
-    Set-UDLicense -License '<License><Terms>PD94bWwgdmVyc2lvbj0iMS4wIj8+DQo8TGljZW5zZVRlcm1zIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zOnhzZD0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiPg0KICA8U3RhcnREYXRlPjIwMTctMDgtMjhUMTM6NDk6MDMuNDYxNjYyMSswMDowMDwvU3RhcnREYXRlPg0KICA8VXNlck5hbWU+amFuLmVnaWwucmluZ0BvdXRsb29rLmNvbTwvVXNlck5hbWU+DQogIDxQcm9kdWN0TmFtZT5Qb3dlclNoZWxsUHJvVG9vbHM8L1Byb2R1Y3ROYW1lPg0KICA8RW5kRGF0ZT4yMDE4LTA4LTI4VDEzOjQ5OjAzLjQ2MTY2MjErMDA6MDA8L0VuZERhdGU+DQogIDxTZWF0TnVtYmVyPjE8L1NlYXROdW1iZXI+DQogIDxJc1RyaWFsPmZhbHNlPC9Jc1RyaWFsPg0KPC9MaWNlbnNlVGVybXM+</Terms><Signature>c1WRfNunHJ7LN0RzDzM9TvCV2cuGCVbBasRMfUDwofSstOHRhNTxnw==</Signature></License>'
+    Set-UDLicense -License '<License><Terms>insert-licence</Signature></License>'
 
 }
 $Colors = @{
