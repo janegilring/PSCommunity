@@ -55,7 +55,7 @@
 
         elseif ($RemoteLock) {
 
-            $Resource = "managedDevices/$DeviceID/remoteLock"
+            $Resource = "deviceManagement/managedDevices/$DeviceID/remoteLock"
             $uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
             write-verbose $uri
             Write-Verbose "Sending remoteLock command to $DeviceID"
@@ -66,7 +66,7 @@
 
         elseif ($Reboot) {
 
-            $Resource = "managedDevices/$DeviceID/rebootNow"
+            $Resource = "deviceManagement/managedDevices/$DeviceID/rebootNow"
             $uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
             write-verbose $uri
             Write-Verbose "Sending remoteLock command to $DeviceID"
@@ -77,7 +77,7 @@
         elseif ($ResetPasscode) {
 
 
-            $Resource = "managedDevices/$DeviceID/resetPasscode"
+            $Resource = "deviceManagement/managedDevices/$DeviceID/resetPasscode"
             $uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
             write-verbose $uri
             Write-Verbose "Sending remotePasscode command to $DeviceID"
@@ -88,7 +88,7 @@
 
         elseif ($RemoveCompanyData) {
 
-            $Resource = "managedDevices/$DeviceID/retire"
+            $Resource = "deviceManagement/managedDevices/$DeviceID/retire"
             $uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
             write-verbose $uri
             Write-Verbose "Sending removeCompanyData command to $DeviceID"
@@ -100,7 +100,7 @@
         elseif ($factoryReset) {
 
 
-            $Resource = "managedDevices/$DeviceID/wipe"
+            $Resource = "deviceManagement/managedDevices/$DeviceID/wipe"
             $uri = "https://graph.microsoft.com/$graphApiVersion/$($resource)"
             write-verbose $uri
             Write-Verbose "Sending factoryReset command to $DeviceID"
