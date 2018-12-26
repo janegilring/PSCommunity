@@ -73,7 +73,7 @@ function Get-ServerFromAD {
         
 }
 
-$ADCredentialPath = "$env:HOMEPATH\$($env:COMPUTERNAME).cred.xml"
+$ADCredentialPath = "$env:HOMEPATH\AD.cred.xml"
 
 if (Test-Path -Path $ADCredentialPath) {
 
@@ -82,7 +82,7 @@ if (Test-Path -Path $ADCredentialPath) {
 } else {
 
     $ADCredential = Get-Credential -Message 'Specify AD credentials'
-    $ADCredential | Export-Clixml -Path "$env:HOMEPATH\$AD.cred.xml"
+    $ADCredential | Export-Clixml -Path $ADCredentialPath
 
 }
 

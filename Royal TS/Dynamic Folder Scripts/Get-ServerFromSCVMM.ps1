@@ -80,7 +80,7 @@ function Get-ServerFromSCVMM {
 
 }
 
-$VMMCredentialPath = "$env:HOMEPATH\$($env:COMPUTERNAME).cred.xml"
+$VMMCredentialPath = "$env:HOMEPATH\VMM.cred.xml"
 
 if (Test-Path -Path $VMMCredentialPath) {
 
@@ -89,7 +89,7 @@ if (Test-Path -Path $VMMCredentialPath) {
 } else {
 
     $VMMCredential = Get-Credential -Message 'Specify VMM credentials'
-    $VMMCredential | Export-Clixml -Path "$env:HOMEPATH\VMM.cred.xml"
+    $VMMCredential | Export-Clixml -Path $VMMCredentialPath
 
 }
 
