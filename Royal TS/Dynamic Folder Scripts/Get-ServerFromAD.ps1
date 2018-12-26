@@ -77,12 +77,12 @@ $ADCredentialPath = "$env:HOMEPATH\$($env:COMPUTERNAME).cred.xml"
 
 if (Test-Path -Path $ADCredentialPath) {
 
-    $ADCredential = Import-Clixml -Path ~\AD-credential.xml
+    $ADCredential = Import-Clixml -Path $ADCredentialPath
 
 } else {
 
     $ADCredential = Get-Credential -Message 'Specify AD credentials'
-    $ADCredential | Export-Clixml -Path "$env:HOMEPATH\$($env:COMPUTERNAME).cred.xml"
+    $ADCredential | Export-Clixml -Path "$env:HOMEPATH\$AD.cred.xml"
 
 }
 
