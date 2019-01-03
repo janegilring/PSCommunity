@@ -80,7 +80,7 @@ function Get-ServerFromSCVMM {
 
 }
 
-$VMMCredentialPath = "$env:HOMEPATH\VMM.cred.xml"
+$VMMCredentialPath = "$env:USERPROFILE\VMM.cred.xml"
 
 if (Test-Path -Path $VMMCredentialPath) {
 

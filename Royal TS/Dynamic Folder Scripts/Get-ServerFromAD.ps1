@@ -73,7 +73,7 @@ function Get-ServerFromAD {
         
 }
 
-$ADCredentialPath = "$env:HOMEPATH\AD.cred.xml"
+$ADCredentialPath = "$env:USERPROFILE\AD.cred.xml"
 
 if (Test-Path -Path $ADCredentialPath) {
 
