@@ -1,3 +1,8 @@
+$ADDomainController = 'powershell.no'
+$InactiveComputerObjectThresholdInDays = '14'
+$RDPCredentialName = 'DOMAIN\username'
+$ADCredentialPath = "$env:USERPROFILE\AD.cred.xml"
+
 function Get-ServerFromAD {
     <#
       .SYNOPSIS
@@ -88,7 +93,7 @@ if (Test-Path -Path $ADCredentialPath) {
 
 [System.Collections.ArrayList]$Servers = @()
 
-Get-ServerFromAD -InactiveComputerObjectThresholdInDays 14 -ADDomainController powershell.no -ADCredential $ADCredential | ForEach-Object {
+Get-ServerFromAD -InactiveComputerObjectThresholdInDays $InactiveComputerObjectThresholdInDays -ADDomainController $ADDomainController -ADCredential $ADCredential | ForEach-Object {
 
     $null = $Servers.Add([PSCustomObject]@{
         Name = $PSItem.Name
