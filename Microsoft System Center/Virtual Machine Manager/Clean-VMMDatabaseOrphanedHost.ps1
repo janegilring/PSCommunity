@@ -56,15 +56,15 @@ if ($OrphanedHostsInVMMSQLDB) {
 
         $SasHbaId = (Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "SELECT * FROM tbl_ADHC_HostBusAdapter WHERE (StorageFileServerNodeID = '$StFileServerNodeId')").HbaId.Guid
 
-        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database VirtualManagerDB -Query "DELETE FROM tbl_ADHC_HostSASHba WHERE (SASHbaId = '$SasHbaId')"
+        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "DELETE FROM tbl_ADHC_HostSASHba WHERE (SASHbaId = '$SasHbaId')"
 
-        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database VirtualManagerDB -Query "DELETE FROM tbl_ADHC_HostBusAdapter WHERE (StorageFileServerNodeID = '$StFileServerNodeId')"
+        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "DELETE FROM tbl_ADHC_HostBusAdapter WHERE (StorageFileServerNodeID = '$StFileServerNodeId')"
 
-        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database VirtualManagerDB -Query "DELETE FROM tbl_ADHC_HostNetworkAdapter WHERE (PhysicalMachineId = '$PhysicalMachineId')"
+        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "DELETE FROM tbl_ADHC_HostNetworkAdapter WHERE (PhysicalMachineId = '$PhysicalMachineId')"
 
-        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database VirtualManagerDB -Query "DELETE FROM tbl_ST_StorageFileServerNode WHERE (PhysicalMachineId = '$PhysicalMachineId')"
+        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "DELETE FROM tbl_ST_StorageFileServerNode WHERE (PhysicalMachineId = '$PhysicalMachineId')"
 
-        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database VirtualManagerDB -Query "DELETE FROM tbl_PMM_PhysicalMachine WHERE (SmBiosGuid = '$OrphanedHost')"
+        Invoke-Sqlcmd -ServerInstance $VMMSQLServerName -Database $VMMDatabaseName -Query "DELETE FROM tbl_PMM_PhysicalMachine WHERE (SmBiosGuid = '$OrphanedHost')"
 
     }
 
