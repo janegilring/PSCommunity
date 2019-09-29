@@ -125,7 +125,7 @@ foreach ($Server in $ServersFromAD) {
 
     if ($Server.Name -in $ExcludedComputerAccounts) {
 
-        Write-Warning "$($Server.Name) is a member of AD group $ExclusionsADGroup - skipping"
+        Write-Output "$($Server.Name) is a member of AD group $ExclusionsADGroup - skipping"
 
     } else {
 
