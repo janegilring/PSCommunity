@@ -50,7 +50,7 @@ Write-Output 'Getting credentials and variables from Azure Automation assets...'
 
 $ADCredential = Get-AutomationPSCredential -name 'cred-ServerAdmin'
 $AzureCredential = Get-AutomationPSCredential -Name cred-Azure
-$AzureSubscription = ''
+$AzureSubscriptionId = '1234567-e9b5-4648-ab8b-815e2ef18a2b'
 $KeyVaultName = 'server-vault'
 $KeyVaultResourceGroupName = 'infrastructure-automation-rg'
 $InactiveComputerObjectThresholdInDays = 30
@@ -84,7 +84,7 @@ Write-Output 'Authenticating to Azure...'
 try {
 
     $null = Add-AzAccount -Credential $AzureCredential -ErrorAction Stop
-    $null = Set-AzContext -Subscription $AzureSubscription -ErrorAction Stop
+    $null = Set-AzContext -Subscription $AzureSubscriptionId -ErrorAction Stop
 
 }
 
@@ -129,7 +129,7 @@ foreach ($Server in $ServersFromAD) {
 
     } else {
 
-    $ExistingPassword = Get-AzKeyVaultSecret -VaultName $VaultName -Name $Server.Name
+    $ExistingPassword = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name
 
     if (-not ($ExistingPassword)) {
 
@@ -186,7 +186,7 @@ if ($UpdatePassword) {
         } -ErrorAction Stop
 
 
-        $null = Set-AzKeyVaultSecret -VaultName $VaultName -Name $Server.Name -SecretValue $PasswordSecureString -ContentType 'Local Administrator password' -ErrorAction Stop
+        $null = Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name -SecretValue $PasswordSecureString -ContentType 'Local Administrator password' -ErrorAction Stop
 
     }
 
