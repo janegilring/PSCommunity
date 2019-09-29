@@ -112,7 +112,7 @@ if (-not ($KeyVault)) {
 Write-Output 'Getting active servers from Active Directory'
 
 # Retrieves all computer accounts from the current domain with the operating system property starting with "Windows Server", excluding failover clustering virtual accounts as well as domain controllers (userAccountControl value 8192 = SERVER_TRUST_ACCOUNT = Domain Controller), filtering out those who haven`t logged on for the last specified amount of days.
-$ServersFromAD = Get-ADComputer -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*))" -Properties description, lastlogondate, operatingSystem, DistinguishedName |
+$ServersFromAD = Get-ADComputer -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*)(!userAccountControl:1.2.840.113556.1.4.803:=8192))" -Properties description, lastlogondate, operatingSystem, DistinguishedName |
 Where-Object lastlogondate -gt (Get-Date).AddDays( - $InactiveComputerObjectThresholdInDays)
 
 $ExcludedComputerAccounts = Get-ADGroupMember -Identity $ExclusionsADGroup | Select-Object -ExpandProperty Name
