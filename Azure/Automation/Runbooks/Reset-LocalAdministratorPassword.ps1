@@ -48,7 +48,7 @@ Write-Output -InputObject "Runbook Reset-LocalAdministratorPassword started $(Ge
 
 Write-Output 'Getting credentials and variables from Azure Automation assets...'
 
-$ADCredential = Get-AutomationPSCredential -name 'cred-ServerAdmin'
+$ServerCredential = Get-AutomationPSCredential -name 'cred-ServerAdmin'
 $AzureCredential = Get-AutomationPSCredential -Name cred-Azure
 $AzureSubscriptionId = '1234567-e9b5-4648-ab8b-815e2ef18a2b'
 $KeyVaultName = 'server-vault'
@@ -113,7 +113,7 @@ Write-Output 'Getting active servers from Active Directory'
 
 # Retrieves all computer accounts from the current domain with the operating system property starting with "Windows Server", excluding failover clustering virtual accounts as well as domain controllers (userAccountControl value 8192 = SERVER_TRUST_ACCOUNT = Domain Controller), filtering out those who haven`t logged on for the last specified amount of days.
 $ServersFromAD = Get-ADComputer -LDAPFilter "(&(objectCategory=computer)(operatingSystem=Windows Server*)(!serviceprincipalname=*MSClusterVirtualServer*)(!userAccountControl:1.2.840.113556.1.4.803:=8192))" -Properties description, lastlogondate, operatingSystem, DistinguishedName |
-Where-Object lastlogondate -gt (Get-Date).AddDays( - $InactiveComputerObjectThresholdInDays)
+    Where-Object lastlogondate -gt (Get-Date).AddDays( - $InactiveComputerObjectThresholdInDays)
 
 $ExcludedComputerAccounts = Get-ADGroupMember -Identity $ExclusionsADGroup | Select-Object -ExpandProperty Name
 
@@ -129,76 +129,93 @@ foreach ($Server in $ServersFromAD) {
 
     } else {
 
-    $ExistingPassword = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name
+        try {
 
-    if (-not ($ExistingPassword)) {
+            $ServerAvailable = Test-WSMan -ComputerName $Server.Name -Credential $ServerCredential -Authentication Negotiate -ErrorAction Stop
 
-        Write-Output "Password for this server does not exist in Key Vault - creating"
+        } catch {
 
-        $UpdatePassword = $true
+            Write-Output "$($Server.Name) is unavailable - skipping"
+            Write-Error "Message: $($_.Exception.Message)"
 
-    } else {
+            $ServerAvailable = $false
 
-        $PasswordAge = (New-TimeSpan -Start $ExistingPassword.Updated).Days
+        }
 
-        if ($PasswordAge -ge $PasswordAgeThreshold -or $Force) {
+        if ($ServerAvailable) {
 
-            Write-Output "Password age in days: $PasswordAge Threshold: $PasswordAgeThreshold"
-            Write-Output "Force password change variable: $Force"
-            Write-Output "Updating password"
+            $ExistingPassword = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name
 
-            $UpdatePassword = $true
+            if (-not ($ExistingPassword)) {
 
-        } else {
+                Write-Output "Password for this server does not exist in Key Vault - creating"
 
-            Write-Output "Password age in days: $PasswordAge Threshold: $PasswordAgeThreshold"
-            Write-Output "Current password status OK"
+                $UpdatePassword = $true
 
-            $UpdatePassword = $false
+            } else {
+
+                $PasswordAge = (New-TimeSpan -Start $ExistingPassword.Updated).Days
+
+                if ($PasswordAge -ge $PasswordAgeThreshold -or $Force) {
+
+                    Write-Output "Password age in days: $PasswordAge Threshold: $PasswordAgeThreshold"
+                    Write-Output "Force password change variable: $Force"
+                    Write-Output "Updating password"
+
+                    $UpdatePassword = $true
+
+                } else {
+
+                    Write-Output "Password age in days: $PasswordAge Threshold: $PasswordAgeThreshold"
+                    Write-Output "Current password status OK"
+
+                    $UpdatePassword = $false
+
+                }
+
+            }
+
+            if ($UpdatePassword) {
+
+                try {
+
+                    Add-Type -AssemblyName System.Web
+                    $Password = [System.Web.Security.Membership]::GeneratePassword($PasswordLength, $SpecialCharCount)
+                    $PasswordSecureString = (ConvertTo-SecureString -String $Password -AsPlainText -Force)
+
+                    Invoke-Command -ComputerName $Server.Name -Credential $ServerCredential -ScriptBlock {
+
+                        try {
+
+                            $account = [ADSI]("WinNT://$($env:computername)/Administrator,user")
+                            $account.psbase.invoke("setpassword", $using:Password)
+
+                        }
+
+                        catch {
+
+                            Write-Error "Failed to Change the administrator password. Error: $($_.Exception.Message)"
+
+                        }
+
+                    } -ErrorAction Stop
+
+
+                    $null = Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name -SecretValue $PasswordSecureString -ContentType 'Local Administrator password' -ErrorAction Stop
+
+                }
+
+                catch {
+
+                    Write-Error "Error occured: $($_.Exception.Message)"
+
+                }
+
+            }
 
         }
 
     }
-
-if ($UpdatePassword) {
-
-    try {
-
-        Add-Type -AssemblyName System.Web
-        $Password = [System.Web.Security.Membership]::GeneratePassword($PasswordLength, $SpecialCharCount)
-        $PasswordSecureString = (ConvertTo-SecureString -String $Password -AsPlainText -Force)
-
-        Invoke-Command -ComputerName $Server.Name -Credential $ADCredential -ScriptBlock {
-
-            try {
-
-                $account = [ADSI]("WinNT://$($env:computername)/Administrator,user")
-                $account.psbase.invoke("setpassword", $using:Password)
-
-            }
-
-            catch {
-
-                Write-Error "Failed to Change the administrator password. Error: $($_.Exception.Message)"
-
-            }
-
-        } -ErrorAction Stop
-
-
-        $null = Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $Server.Name -SecretValue $PasswordSecureString -ContentType 'Local Administrator password' -ErrorAction Stop
-
-    }
-
-    catch {
-
-        Write-Error "Error occured: $($_.Exception.Message)"
-
-     }
-
-    }
-
-  }
 
 }
 
