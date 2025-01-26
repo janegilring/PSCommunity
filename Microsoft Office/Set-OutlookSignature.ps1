@@ -115,7 +115,7 @@ $env:Processor_Architecture
  
 #Environment variables
  $AppData=(Get-Item env:appdata).value
- $SigPath = "\Microsoft\Signaturer\"
+ $SigPath = "\Microsoft\Signatures\"
  $LocalSignaturePath = $AppData+$SigPath
  $RemoteSignaturePathFull = $SigSource+"$TemplateName.docx"
 
@@ -305,7 +305,7 @@ if ($SignatureVersion -eq $SigVersion){}
  {Set-ItemProperty $CompanyRegPath"\$TemplateName" -name SignatureVersion -Value $SigVersion}
 
  #Forcing signature for new messages if enabled
- if ($ForcedSignatureNew -eq ‘1’)
+ if ($ForcedSignatureNew -eq "1")
  {
  #Set company signature as default for New messages
  $MSWord = New-Object -com word.application
@@ -317,7 +317,7 @@ if ($SignatureVersion -eq $SigVersion){}
  }
 
 #Forcing signature for reply/forward messages if enabled
- if ($ForcedSignatureReplyForward -eq ‘1’)
+ if ($ForcedSignatureReplyForward -eq "1")
  {
  #Set company signature as default for Reply/Forward messages
  $MSWord = New-Object -com word.application
